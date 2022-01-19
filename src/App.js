@@ -4,14 +4,29 @@ import {TaskBanner} from './components/TaskBanner';
 import { TaskCreator } from "./components/TaskCreator";
 import toast from 'react-simple-toasts';
 import { VisibilityControl } from "./components/VisibilityControl";
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
 
+  const [data, setData] = useState([]);
+
+  const apiGet = () => {
+    fetch("https://catfact.ninja/facts")
+      .then( (response) => response.json())
+      .then( (json) => {
+        setData(json.data);
+      } );
+  };
+
+  useEffect( ()=> {
+    apiGet();
+  }, [])
+
   const [taskItems, setTaskItems] = useState([
-    { nombre: "Tarea 1", hecho: false, descripcion: "Descripcion Tarea 1" },
-    { nombre: "Tarea 2", hecho: false, descripcion: "Descripcion Tarea 2" },
-    { nombre: "Tarea 3", hecho: true, descripcion: "Descripcion Tarea 3" },
-    { nombre: "Tarea 4", hecho: false, descripcion: "Descripcion Tarea 4" }
+    { id: uuidv4(), nombre: "Tarea 1", hecho: false, descripcion: "Descripcion Tarea 1" },
+    {  id: uuidv4(), nombre: "Tarea 2", hecho: false, descripcion: "Descripcion Tarea 2" },
+    {  id: uuidv4(), nombre: "Tarea 3", hecho: true, descripcion: "Descripcion Tarea 3" },
+    {  id: uuidv4(), nombre: "Tarea 4", hecho: false, descripcion: "Descripcion Tarea 4" }
   ]);
   const [showCompleted, setShowCompleted] = useState(true);
 
@@ -21,10 +36,10 @@ function App() {
       setTaskItems(JSON.parse(data));
     }else{
       setTaskItems([
-        { nombre: "Tarea 1 ejemplo", hecho: false, descripcion: "Descripcion Tarea 1 ejemplo" },
-        { nombre: "Tarea 2 ejemplo", hecho: false, descripcion: "Descripcion Tarea 2 ejemplo" },
-        { nombre: "Tarea 3 ejemplo", hecho: true, descripcion: "Descripcion Tarea 3 ejemplo" },
-        { nombre: "Tarea 4 ejemplo", hecho: false, descripcion: "Descripcion Tarea 4 ejemplo" }
+        { id: uuidv4(), nombre: "Tarea 1 ejemplo", hecho: false, descripcion: "Descripcion Tarea 1 ejemplo" },
+        { id: uuidv4(), nombre: "Tarea 2 ejemplo", hecho: false, descripcion: "Descripcion Tarea 2 ejemplo" },
+        { id: uuidv4(), nombre: "Tarea 3 ejemplo", hecho: true, descripcion: "Descripcion Tarea 3 ejemplo" },
+        { id: uuidv4(), nombre: "Tarea 4 ejemplo", hecho: false, descripcion: "Descripcion Tarea 4 ejemplo" }
       ])
       setShowCompleted(true);
     }
@@ -33,13 +48,33 @@ function App() {
     localStorage.setItem("tasks", JSON.stringify(taskItems));
   }, [taskItems] );
 
-  const createNewTask = (taskName, taskDescription) =>{
-    if(!taskItems.find(t => t.nombre === taskName)){
-      setTaskItems([...taskItems, {nombre: taskName, descripcion:taskDescription, hecho:false }]);
-      toast("Tarea agregada correctamente :)");
+  const createNewTask = (taskName, taskDescription, taskId) =>{
+    if(!taskItems.find(t => t.id === taskId)){
+      setTaskItems([...taskItems, {id: taskId, nombre: taskName, descripcion:taskDescription, hecho:false }]);
+      toast("Tarea agregada correctamente 😊");
     }else{
-      toast("Tarea ya existe! >:(");
+      toast("Tarea ya existe!");
     }
+  }
+
+  const editTask = (taskName, taskDescription, taskId) => {
+     if(taskItems.find( t=> t.id === taskId )){
+       setTaskItems( taskItems.map( t =>{
+         if(t.id === taskId) {
+           t.nombre = taskName;
+           t.descripcion = taskDescription;
+         }
+         return t;
+       } ) );
+       toast("Tarea modificada correctamente 😊");
+     }else{
+       toast("La tarea no existe!")
+     }
+   }
+
+  const deleteTask = (id) => {      
+    setTaskItems(taskItems.filter( t => t.id !== id ));
+    toast("Tarea eliminada correctamente 😊");
   }
 
   const toggleTask = task => 
@@ -56,7 +91,7 @@ function App() {
       }
     })
     .map(task => (
-      <TaskRow task={task} key={task.nombre} toggleTask={toggleTask} />
+      <TaskRow task={task} key={task.id} toggleTask={toggleTask} deleteTask = {deleteTask} editTask = {editTask} />
   ));
 
   const [searchTerm, setSearchTerm] = useState("");  
@@ -67,7 +102,7 @@ function App() {
     <div >
       <TaskBanner taskItems={taskItems} />
       <div className="container ">
-        <TaskCreator callback = {createNewTask} />
+        <TaskCreator callback = {createNewTask} data = {data} />
         <div className="d-flex justify-content-center mb-3">
           <i className="fas fa-search mx-3 h4" ></i>
           <input 
@@ -80,9 +115,7 @@ function App() {
           />
         </div>
         
-      </div>
-      
-      <table className="table table-striped table-bordered table-hover w-75 m-auto">
+        <table className="table table-striped table-bordered table-hover m-auto">
         <thead >
           <tr>
             <th>Tarea</th>
@@ -96,6 +129,10 @@ function App() {
         </tbody>
       </table>
 
+      </div>
+      
+      
+
       <div className="bg-secondary-text-white text-center p-2">
         <VisibilityControl 
         taskItems={taskItems}
@@ -105,7 +142,8 @@ function App() {
 
       {
         showCompleted && (
-          <table className="table table-striped table-bordered table-hover w-75 m-auto mb-5">
+          <div className="container">
+            <table className="table table-striped table-bordered table-hover m-auto mb-5">
             <thead>
               <tr>
                 <th>Tarea</th>
@@ -118,6 +156,8 @@ function App() {
               {taskTableRows(true)}
             </tbody>
           </table>
+          </div>
+          
         )
       }
 

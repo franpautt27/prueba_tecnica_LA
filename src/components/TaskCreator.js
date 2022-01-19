@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { v4 as uuidv4 } from 'uuid';
 
-export const TaskCreator = props => {
+export const TaskCreator = (props) => {
 
     const [newTaskName, setNewTaskName] = useState("");
-    const [newTaskDescription, setNewTaskDescription] = useState("")
+    const [newTaskDescription, setNewTaskDescription] = useState("");
+    const newTaskId = uuidv4();
 
     const updateNewTaskValue = e => setNewTaskName(e.target.value);
     const updateNewTaskDescription = e => setNewTaskDescription(e.target.value);
@@ -14,7 +16,7 @@ export const TaskCreator = props => {
         let inputTitulo = document.getElementById("titulo");
         let inputDescripcion = document.getElementById("descripcion");
         if(inputTitulo.value !== "" && inputDescripcion.value !== ""){
-            props.callback(newTaskName, newTaskDescription)
+            props.callback(newTaskName, newTaskDescription, newTaskId)
             console.log(newTaskName);
             setNewTaskName("");
             console.log(newTaskDescription);
@@ -55,11 +57,14 @@ export const TaskCreator = props => {
             onChange={updateNewTaskValue}
             />
             <label htmlFor="descripcion" className="m-2">Ingrese la descripcion de la tarea:</label>
-            <input id="descripcion" type="text" placeholder="Ingrese la descripcion de la tarea"
-            className="form-control"
-            value={newTaskDescription}
-            onChange={updateNewTaskDescription}
-            />
+
+            <select id="descripcion" className="form-select" aria-label="Default select example" value={newTaskDescription} onChange={updateNewTaskDescription}>
+              <option defaultValue> </option>
+              { props.data.map( item => 
+                  <option key={item.fact} value={item.fact}> {item.fact} </option>
+                ) }
+              
+            </select>
 
         </div>
         </Modal.Body>
