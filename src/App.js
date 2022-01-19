@@ -8,8 +8,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 function App() {
 
+  //se nombra una variable de estado para almacenar la lista de frases de gatos de la API
   const [data, setData] = useState([]);
 
+  //  con esta funcion se traen los datos de la APIRest de frases de gatos a la interfaz
+  // cabe aclarar que hay mas de 300 registros de frases y se seleccionan 10 de manera aleatoria
+  // cada vez que se cargue la pagina
   const apiGet = () => {
     fetch("https://catfact.ninja/facts")
       .then( (response) => response.json())
@@ -17,11 +21,11 @@ function App() {
         setData(json.data);
       } );
   };
-
+  // para que los datos esten en el storage una vez se cargue la pagina, se hace uso del useEffect
   useEffect( ()=> {
     apiGet();
   }, [])
-
+  // Hacemos un useState con datos de tareas de ejemplo para hacer las pruebas 
   const [taskItems, setTaskItems] = useState([
     { id: uuidv4(), nombre: "Tarea 1", hecho: false, descripcion: "Descripcion Tarea 1" },
     {  id: uuidv4(), nombre: "Tarea 2", hecho: false, descripcion: "Descripcion Tarea 2" },
@@ -29,7 +33,7 @@ function App() {
     {  id: uuidv4(), nombre: "Tarea 4", hecho: false, descripcion: "Descripcion Tarea 4" }
   ]);
   const [showCompleted, setShowCompleted] = useState(true);
-
+  //se hace uso del ultimo useEffect  para que se carguen datos de ejemplo en caso de que se limpie todo el storage
   useEffect( () => {
     let data = localStorage.getItem("tasks");
     if (data !== null){
@@ -47,7 +51,7 @@ function App() {
   useEffect( () => {
     localStorage.setItem("tasks", JSON.stringify(taskItems));
   }, [taskItems] );
-
+  // funcion para crear una tarea nueva
   const createNewTask = (taskName, taskDescription, taskId) =>{
     if(!taskItems.find(t => t.id === taskId)){
       setTaskItems([...taskItems, {id: taskId, nombre: taskName, descripcion:taskDescription, hecho:false }]);
@@ -56,7 +60,7 @@ function App() {
       toast("Tarea ya existe!");
     }
   }
-
+  // funcion para editar una tarea registrada
   const editTask = (taskName, taskDescription, taskId) => {
      if(taskItems.find( t=> t.id === taskId )){
        setTaskItems( taskItems.map( t =>{
@@ -71,15 +75,16 @@ function App() {
        toast("La tarea no existe!")
      }
    }
-
+   // funcion para eliminar una tarea registrada
   const deleteTask = (id) => {      
     setTaskItems(taskItems.filter( t => t.id !== id ));
     toast("Tarea eliminada correctamente 😊");
   }
-
+  // esto es para hacer que una tarea pueda modificar su atributo booleano de Hecho con un checkbox
   const toggleTask = task => 
-    setTaskItems( taskItems.map(t => (t.nombre === task.nombre ? {...t, hecho : !t.hecho} : t )) )
-
+    setTaskItems( taskItems.map(t => (t.id === task.id ? {...t, hecho : !t.hecho} : t )) )
+  // esto es para separar las tareas hechas con las pendientes en tablas distintas
+  //y luego se usa el segundo filtro para que lal busqueda instantanea de la descripcion funcione
   const taskTableRows = (valorHecho) => 
     taskItems
     .filter(task => task.hecho === valorHecho)
@@ -93,7 +98,7 @@ function App() {
     .map(task => (
       <TaskRow task={task} key={task.id} toggleTask={toggleTask} deleteTask = {deleteTask} editTask = {editTask} />
   ));
-
+  // se declara la variable de estado para el valor de la busqueda 
   const [searchTerm, setSearchTerm] = useState("");  
   
   

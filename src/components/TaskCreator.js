@@ -4,14 +4,16 @@ import Button from "react-bootstrap/Button";
 import { v4 as uuidv4 } from 'uuid';
 
 export const TaskCreator = (props) => {
-
+    // creamos una variable de estado para almacenar el nuevo nombre de la tarea a crear
     const [newTaskName, setNewTaskName] = useState("");
     const [newTaskDescription, setNewTaskDescription] = useState("");
     const newTaskId = uuidv4();
 
+    // creamos una variable de estado para almacenar el nuevo nombre de la decripcion a crear
     const updateNewTaskValue = e => setNewTaskName(e.target.value);
     const updateNewTaskDescription = e => setNewTaskDescription(e.target.value);
 
+    // funcion que permite la agregacion de una nueva tarea (con validaciones)
     const createNewTask = () => {
         let inputTitulo = document.getElementById("titulo");
         let inputDescripcion = document.getElementById("descripcion");
