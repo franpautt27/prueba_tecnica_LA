@@ -60,13 +60,20 @@ export const TaskCreator = (props) => {
             />
             <label htmlFor="descripcion" className="m-2">Ingrese la descripcion de la tarea:</label>
 
-            <select id="descripcion" className="form-select" aria-label="Default select example" value={newTaskDescription} onChange={updateNewTaskDescription}>
-              <option defaultValue> </option>
-              { props.data.map( item => 
+            <input className="form-control"
+             type="text" id="descripcion"
+              list="lista"
+               placeholder="Ingrese la descripcion de la tarea"
+               value={newTaskDescription}
+               onChange={updateNewTaskDescription}
+               />
+            <datalist id="lista">
+                { props.data.map( item => 
                   <option key={item.fact} value={item.fact}> {item.fact} </option>
-                ) }
-              
-            </select>
+                  ) }         
+            </datalist>
+
+            
 
         </div>
         </Modal.Body>
