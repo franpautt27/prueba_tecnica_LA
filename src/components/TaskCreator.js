@@ -17,7 +17,7 @@ export const TaskCreator = (props) => {
     const createNewTask = () => {
         let inputTitulo = document.getElementById("titulo");
         let inputDescripcion = document.getElementById("descripcion");
-        if(inputTitulo.value !== "" && inputDescripcion.value !== ""){
+        if(inputTitulo.value.trim() !== "" && inputDescripcion.value.trim() !== ""){
             props.callback(newTaskName, newTaskDescription, newTaskId)
             console.log(newTaskName);
             setNewTaskName("");

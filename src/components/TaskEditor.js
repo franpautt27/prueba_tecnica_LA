@@ -23,7 +23,7 @@ export const TaskEditor = (props) => {
   const editOldTask = () => {
     let inputTitulo = document.getElementById("tituloEdit");
     let inputDescripcion = document.getElementById("descripcionEdit");
-    if(inputTitulo.value !== "" && inputDescripcion.value !== ""){
+    if(inputTitulo.value.trim() !== "" && inputDescripcion.value.trim() !== ""){
       props.editTask(editTaskName, editTaskDescription, props.idTarea);
       console.log(editTaskName);
       setEditTaskName(inputTitulo.value);
